@@ -235,6 +235,19 @@ public final class OpenAIClientBuilder implements HttpTrait<OpenAIClientBuilder>
     }
 
     /*
+     * Whether to use NonAzureOpenAIClient() regardless of the endpoint
+     */
+    private boolean forceNonAzureOpenAIClient;
+
+    /**
+     * Set to true to force using NonAzureOpenAIClient() regardless of the endpoint
+     */
+    public OpenAIClientBuilder forceNonAzureOpenAIClient(boolean forceNonAzureOpenAIClient) {
+        this.forceNonAzureOpenAIClient = forceNonAzureOpenAIClient;
+        return this;
+    }
+
+    /*
      * Service version
      */
     @Generated
@@ -327,7 +340,7 @@ public final class OpenAIClientBuilder implements HttpTrait<OpenAIClientBuilder>
     private NonAzureOpenAIClientImpl buildInnerNonAzureOpenAIClient() {
         HttpPipeline localPipeline = (pipeline != null) ? pipeline : createHttpPipeline();
         NonAzureOpenAIClientImpl client
-            = new NonAzureOpenAIClientImpl(localPipeline, JacksonAdapter.createDefaultSerializerAdapter());
+            = new NonAzureOpenAIClientImpl(localPipeline, JacksonAdapter.createDefaultSerializerAdapter(), endpoint);
         return client;
     }
 
@@ -354,10 +367,10 @@ public final class OpenAIClientBuilder implements HttpTrait<OpenAIClientBuilder>
     private static final ClientLogger LOGGER = new ClientLogger(OpenAIClientBuilder.class);
 
     /**
-     * OpenAI service can be used by either not setting the endpoint or by setting the endpoint to start with
-     * "https://api.openai.com/"
+     * OpenAI service can be used by either not setting the endpoint, by setting the endpoint to start with
+     * "https://api.openai.com/" or by first calling forceNonAzureOpenAIClient(true)
      */
     private boolean useNonAzureOpenAIService() {
-        return endpoint == null || endpoint.startsWith(OPEN_AI_ENDPOINT);
+        return endpoint == null || endpoint.startsWith(OPEN_AI_ENDPOINT) || forceNonAzureOpenAIClient;
     }
 }
